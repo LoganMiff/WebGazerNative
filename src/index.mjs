@@ -11,6 +11,9 @@ import Reg from './ridgeReg.mjs';
 import ridgeRegWeighted from './ridgeWeightedReg.mjs';
 import ridgeRegThreaded from './ridgeRegThreaded.mjs';
 import util from './util.mjs';
+import GazeDot from './components/GazeDot';
+import { useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import { useEffect, useState } from 'react';
 
 const webgazer = {};
 webgazer.tracker = {};
@@ -26,7 +29,7 @@ webgazer.params = params;
 //video elements
 var videoStream = null;
 var videoContainerElement = null;
-var videoElement = null;
+var videoFrame = null;
 var videoElementCanvas = null;
 var faceOverlay = null;
 var faceFeedbackBox = null;
@@ -121,8 +124,8 @@ webgazer.computeValidationBoxSize = function() {
 function checkEyesInValidationBox() {
 
   if (faceFeedbackBox != null && latestEyeFeatures) {
-    var w = videoElement.videoWidth;
-    var h = videoElement.videoHeight;
+    var w = videoFrame.width;
+    var h = videoFrame.height;
 
     // Find the size of the box.
     // Pick the smaller of the two video preview sizes
@@ -201,7 +204,7 @@ function getPupilFeatures(canvas, width, height) {
     return;
   }
   try {
-    return curTracker.getEyePatches(videoElement, canvas, width, height);
+    return curTracker.getEyePatches(videoFrame, canvas, width, height);
   } catch(err) {
     console.log("can't get pupil features ", err);
     return null;
@@ -234,7 +237,7 @@ function paintCurrentFrame(canvas, width, height) {
 async function getPrediction(regModelIndex) {
   var predictions = [];
   // [20200617 xk] TODO: this call should be made async somehow. will take some work.
-  latestEyeFeatures = await getPupilFeatures(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
+  latestEyeFeatures = await getPupilFeatures();
 
   if (regs.length === 0) {
     console.log('regression not set, call setRegression()');
@@ -1164,4 +1167,101 @@ webgazer.getStoredPoints = function() {
   return [xPast50, yPast50];
 }
 
-export default webgazer;
+export default function Webgazer( { gazeAction } ) {
+  const [x, setX] = useState(100);
+  const [y, setY] = useState(100);
+  const [eyetrackFrameProcessor, setETFP] = useState(null);
+  const [cameraDevice, setCameraDevice] = useState(null);
+
+  const [paused, isPaused] = useState(false);
+
+
+  useEffect(() => {
+    setCameraDevice(useCameraDevice('front'));
+
+    setETFP(useFrameProcessor(async (frame) => {
+      'worklet'
+      if (!paused) {
+
+      // [20200617 XK] TODO: there is currently lag between the camera input and the face overlay. This behavior
+      // is not seen in the facemesh demo. probably need to optimize async implementation. I think the issue lies
+      // in the implementation of getPrediction().
+
+      // Paint the latest video frame into the canvas which will be analyzed by WebGazer
+      // [20180729 JT] Why do we need to do this? clmTracker does this itself _already_, which is just duplicating the work.
+      // Is it because other trackers need a canvas instead of an img/video element?
+  //    paintCurrentFrame(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
+
+      // Get gaze prediction (ask clm to track; pass the data to the regressor; get back a prediction)
+      videoFrame = frame;
+      latestGazeData = getPrediction();
+      // Count time
+      var elapsedTime = performance.now() - clockStart;
+
+      // Draw face overlay
+      if( false )//webgazer.params.showFaceOverlay )
+      {
+        // Get tracker object
+        var tracker = webgazer.getTracker();
+        faceOverlay.getContext('2d', { willReadFrequently: true }).clearRect( 0, 0, videoElement.videoWidth, videoElement.videoHeight);
+        tracker.drawFaceOverlay(faceOverlay.getContext('2d', { willReadFrequently: true }), tracker.getPositions());
+      }
+
+      // Feedback box
+      // Check that the eyes are inside of the validation box
+      if( false )//webgazer.params.showFaceFeedbackBox )
+        checkEyesInValidationBox();
+
+      latestGazeData = await latestGazeData;
+
+      // [20200623 xk] callback to function passed into setGazeListener(fn)
+      gazeAction(latestGazeData, elapsedTime);
+
+      if( latestGazeData ) {
+        // [20200608 XK] Smoothing across the most recent 4 predictions, do we need this with Kalman filter?
+        smoothingVals.push(latestGazeData);
+        var latestX = 0;
+        var latestY = 0;
+        var len = smoothingVals.length;
+        for (var d in smoothingVals.data) {
+          latestX += smoothingVals.get(d).x;
+          latestY += smoothingVals.get(d).y;
+        }
+
+        var pred = util.bound({'x':latestX/len, 'y':latestY/len});
+
+        setX(latestX);
+        setY(latestY);
+
+        if (webgazer.params.storingPoints) {
+          //drawCoordinates('blue',pred.x,pred.y); //draws the previous predictions
+          //store the position of the past fifty occuring tracker preditions
+          webgazer.storePoints(pred.x, pred.y, k);
+          k++;
+          if (k == 50) {
+            k = 0;
+          }
+        }
+        // GazeDot
+        if (false){ //webgazer.params.showGazeDot) {
+          gazeDot.style.display = 'block';
+        }
+        gazeDot.style.transform = 'translate3d(' + pred.x + 'px,' + pred.y + 'px,0)';
+      } else {
+        gazeDot.style.display = 'none';
+      }
+    }
+    }, []));
+  }, []);
+
+  return(
+    <View>
+      <Camera 
+        frameProcessor={eyetrackFrameProcessor}
+        device = { device }
+        isActive = { pause }
+      />
+      <GazeDot x={x} y={y} radius={10}/>
+    </View>
+  );
+}

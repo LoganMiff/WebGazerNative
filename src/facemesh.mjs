@@ -1,4 +1,5 @@
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
+import { Frame } from 'react-native-vision-camera';
 
 /**
  * Constructor of TFFaceMesh object
@@ -19,13 +20,13 @@ TFFaceMesh.prototype.positionsArray = null;
 
 /**
  * Isolates the two patches that correspond to the user's eyes
- * @param  {Object} video - the video element itself
+ * @param  {Frame} videoFrame - a video frame to get eye patch data from
  * @param  {Canvas} imageCanvas - canvas corresponding to the webcam stream
  * @param  {Number} width - of imageCanvas
  * @param  {Number} height - of imageCanvas
  * @return {Object} the two eye-patches, first left, then right eye
  */
-TFFaceMesh.prototype.getEyePatches = async function(video, imageCanvas, width, height) {
+TFFaceMesh.prototype.getEyePatches = async function(videoFrame, imageCanvas, width, height) {
 
   if (imageCanvas.width === 0) {
     return null;
@@ -37,7 +38,7 @@ TFFaceMesh.prototype.getEyePatches = async function(video, imageCanvas, width, h
   // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain an
   // array of detected faces from the MediaPipe graph.
   const predictions = await model.estimateFaces({
-    input: video,
+    input: videoFrame,
     returnTensors: false,
     flipHorizontal: false,
     predictIrises: false,
