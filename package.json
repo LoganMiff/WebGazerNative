@@ -28,9 +28,13 @@
     "@tensorflow-models/face-landmarks-detection": "0.0.3",
     "@tensorflow/tfjs": "^3.15.0",
     "localforage": "1.7.3",
-    "react-native": "^0.80.2",
     "react-native-vision-camera": "^4.7.1",
     "regression": "2.0.1"
+  },
+  "peerDependencies": {
+    "react": ">=19.1.1",
+    "react-dom": ">=19.0.0",
+    "react-native": ">=0.80.0"
   },
   "devDependencies": {
     "browser-sync": "^3.0.2",

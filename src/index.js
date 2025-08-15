@@ -12,8 +12,11 @@ import ridgeRegWeighted from './ridgeWeightedReg.js';
 import ridgeRegThreaded from './ridgeRegThreaded.js';
 import util from './util.js';
 import GazeDot from './components/GazeDot.js';
+import { View } from 'react-native';
 import { useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import { useEffect, useState } from 'react';
+
+import { GazeDot } from './components/GazeDot.js';
 
 const webgazer = {};
 webgazer.tracker = {};
@@ -1176,11 +1179,13 @@ export default function Webgazer( { gazeAction } ) {
   const [paused, isPaused] = useState(false);
 
 
+  /*
   useEffect(() => {
     setCameraDevice(useCameraDevice('front'));
 
     setETFP(useFrameProcessor(async (frame) => {
       'worklet'
+      
       if (!paused) {
 
       // [20200617 XK] TODO: there is currently lag between the camera input and the face overlay. This behavior
@@ -1253,6 +1258,7 @@ export default function Webgazer( { gazeAction } ) {
     }
     }, []));
   }, []);
+  */
 
   return(
     <View>
