@@ -10,7 +10,7 @@ const bannerString =`
  `;
 
 const varConfig = {
-	entry: './src/index.mjs',
+	entry: './src/index.js',
 	output: {
 		filename: 'webgazer.js',
 		library: {
@@ -63,7 +63,7 @@ const varConfig = {
 };
 
 const commonjs2Config = {
-	entry: './src/index.mjs',
+	entry: './src/index.js',
 	output: {
 		filename: 'webgazer.commonjs2.js',
 		library: {

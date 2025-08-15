@@ -1,14 +1,12 @@
 {
-  "name": "webgazer",
+  "name": "webgazer-native",
   "version": "3.3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/brownhci/WebGazer.git"
   },
   "license": "GPL-3.0-or-later",
-  "main": "dist/webgazer.js",
-  "type": "module",
-  "module": "src/index.mjs",
+  "main": "src/index.js",
   "scripts": {
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
@@ -21,7 +19,7 @@
     "/src"
   ],
   "keywords": [
-    "webgazer",
+    "webgazer-native",
     "eyetracking",
     "webcam",
     "online"
