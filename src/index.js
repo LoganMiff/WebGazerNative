@@ -1256,7 +1256,7 @@ export default function Webgazer( { gazeAction } ) {
     <View>
       <Camera 
         frameProcessor={eyetrackFrameProcessor}
-        device = { device }
+        device = { cameraDevice }
         isActive = { pause }
       />
       <GazeDot x={x} y={y} radius={10}/>
