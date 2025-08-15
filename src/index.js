@@ -13,7 +13,7 @@ import ridgeRegThreaded from './ridgeRegThreaded.js';
 import util from './util.js';
 import GazeDot from './components/GazeDot.js';
 import { View } from 'react-native';
-import { useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import { useEffect, useState } from 'react';
 
 const webgazer = {};
