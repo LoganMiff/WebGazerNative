@@ -1176,8 +1176,6 @@ export default function Webgazer( { gazeAction } ) {
 
   const [paused, isPaused] = useState(false);
 
-
-  /*
   useEffect(() => {
     setCameraDevice(useCameraDevice('front'));
 
@@ -1249,14 +1247,10 @@ export default function Webgazer( { gazeAction } ) {
         if (false){ //webgazer.params.showGazeDot) {
           gazeDot.style.display = 'block';
         }
-        gazeDot.style.transform = 'translate3d(' + pred.x + 'px,' + pred.y + 'px,0)';
-      } else {
-        gazeDot.style.display = 'none';
       }
     }
     }, []));
   }, []);
-  */
 
   return(
     <View>
