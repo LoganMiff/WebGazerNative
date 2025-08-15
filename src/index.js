@@ -16,8 +16,6 @@ import { View } from 'react-native';
 import { useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
 import { useEffect, useState } from 'react';
 
-import { GazeDot } from './components/GazeDot.js';
-
 const webgazer = {};
 webgazer.tracker = {};
 webgazer.tracker.TFFaceMesh = TFFaceMesh;
