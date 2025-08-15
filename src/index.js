@@ -1181,8 +1181,6 @@ export default function Webgazer( { gazeAction } ) {
 
     setETFP(useFrameProcessor(async (frame) => {
       'worklet'
-      
-      if (!paused) {
 
       // [20200617 XK] TODO: there is currently lag between the camera input and the face overlay. This behavior
       // is not seen in the facemesh demo. probably need to optimize async implementation. I think the issue lies
@@ -1248,7 +1246,6 @@ export default function Webgazer( { gazeAction } ) {
           gazeDot.style.display = 'block';
         }
       }
-    }
     }, []));
   }, []);
 
@@ -1257,7 +1254,7 @@ export default function Webgazer( { gazeAction } ) {
       <Camera 
         frameProcessor={eyetrackFrameProcessor}
         device = { cameraDevice }
-        isActive = { pause }
+        isActive = { paused }
       />
       <GazeDot x={x} y={y} radius={10}/>
     </View>
