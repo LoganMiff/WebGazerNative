@@ -13,7 +13,7 @@ import ridgeRegThreaded from './ridgeRegThreaded.js';
 import util from './util.js';
 import GazeDot from './components/GazeDot.js';
 import { View } from 'react-native';
-import { Camera, useCameraDevice, useFrameProcessor, Frame } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraPermission, useFrameProcessor } from 'react-native-vision-camera';
 import { useEffect, useState } from 'react';
 
 const webgazer = {};
@@ -1172,11 +1172,16 @@ export default function Webgazer( { gazeAction } ) {
   const [x, setX] = useState(100);
   const [y, setY] = useState(100);
   const [eyetrackFrameProcessor, setETFP] = useState(null);
+  const { hasPermission, requestPermission } = useCameraPermission();
   const [cameraDevice, setCameraDevice] = useState(null);
 
   const [paused, isPaused] = useState(false);
 
   useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+
     setCameraDevice(useCameraDevice('front'));
 
     setETFP(useFrameProcessor(async (frame) => {
@@ -1247,15 +1252,18 @@ export default function Webgazer( { gazeAction } ) {
         }
       }
     }, []));
-  }, []);
+  }, [hasPermission]);
 
   return(
     <View>
+      { cameraDevice ? 
       <Camera 
         frameProcessor={eyetrackFrameProcessor}
         device = { cameraDevice }
         isActive = { paused }
-      />
+      /> :
+      <Text>No camera found on device...</Text>
+      }
       <GazeDot x={x} y={y} radius={10}/>
     </View>
   );
