@@ -1185,6 +1185,7 @@ export default function Webgazer( { gazeAction } ) {
     setCameraDevice(useCameraDevice('front'));
 
     setETFP(useFrameProcessor(async (frame) => {
+      /*
       'worklet'
 
       // [20200617 XK] TODO: there is currently lag between the camera input and the face overlay. This behavior
@@ -1250,7 +1251,7 @@ export default function Webgazer( { gazeAction } ) {
         if (false){ //webgazer.params.showGazeDot) {
           gazeDot.style.display = 'block';
         }
-      }
+      }*/
     }, []));
   }, [hasPermission]);
 
